@@ -13,7 +13,7 @@
     "facebook": "source config/env && hubot -a fb",
     "postinstall": "initDb src/nlc/NLC.json",
     "test": "mocha --require coffee-script/register --compilers coffee:coffee-script test",
-    "coverage": ". test/.env && istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "author": "ibm-cloud-solutions",
   "license": "Apache-2.0",
