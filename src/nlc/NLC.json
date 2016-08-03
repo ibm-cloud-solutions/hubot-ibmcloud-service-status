@@ -1,0 +1,93 @@
+{   "name": "IBMcloudStatus",
+	"version": "0.0.1",
+	"classes": [
+		{
+			"class": "ibmcloud.status.help",
+			"emittarget": "ibmcloud.status.help",
+			"texts": [
+				"I want help with IBM Cloud status.",
+				"How can I get the status of Bluemix",
+				"help cloud status"
+			]
+		},
+		{
+			"class": "ibmcloud.region.status",
+			"emittarget": "ibmcloud.region.status",
+			"texts": [
+				"Show me the region status of",
+				"What is the availability for",
+				"List the status for the cloud",
+				"Get the health of bluemix"
+			],
+			"parameters" : [
+				{
+					"name": "region",
+					"type": "entity",
+					"prompt": "OK. What region do you want status for *US South*, *United Kingdom*, or *Sydney*?"
+				}
+			]
+		},
+		{
+			"class": "ibmcloud.service.status",
+			"emittarget": "ibmcloud.service.status",
+			"texts": [
+				"Can you provide the status for service",
+				"Please obtain the status of service",
+				"health of the following service"
+			],
+			"parameters" : [
+				{
+					"name": "region",
+					"type": "entity",
+					"prompt": "OK. What region do you want the status for *US South*, *United Kingdom*, or *Sydney*?"
+				},
+				{
+					"name": "service",
+					"type": "entity",
+					"prompt": "OK. What service do you want the status for?"
+				}
+			]
+		},
+		{
+			"class": "ibmcloud.service.monitor",
+			"emittarget": "ibmcloud.service.monitor",
+			"texts": [
+				"I want to monitor the status of the service",
+				"Notify me when the service health changes",
+				"Alert me when a service goes down",
+				"Tell me when a service comes back up"
+			],
+			"parameters" : [
+				{
+					"name": "region",
+					"type": "entity",
+					"prompt": "OK. What region do you want the status for *US South*, *United Kingdom*, or *Sydney*?"
+				},
+				{
+					"name": "service",
+					"type": "entity",
+					"prompt": "OK. What service do you want the status for?"
+				},
+				{
+					"name": "status",
+					"type": "entity",
+					"prompt": "OK. What status do you want to be alerted for *up* or *down*?"
+				}
+			]
+		}
+	],
+	"parameter.values" : [
+		{
+			"name": "region",
+			"values": ["US South", "United Kingdom", "Sydney"]
+		},
+		{
+			"name": "service",
+			"values": []
+		},
+		{
+			"name": "status",
+			"values": ["up", "down"]
+		}
+	]
+}
