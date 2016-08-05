@@ -3,6 +3,7 @@
 	"classes": [
 		{
 			"class": "ibmcloud.status.help",
+            "description": "Help with Bluemix status",
 			"emittarget": "ibmcloud.status.help",
 			"texts": [
 				"I want help with IBM Cloud status.",
@@ -12,6 +13,7 @@
 		},
 		{
 			"class": "ibmcloud.region.status",
+            "description": "Show the status of a Bluemix region",
 			"emittarget": "ibmcloud.region.status",
 			"texts": [
 				"Show me the region status of",
@@ -29,6 +31,7 @@
 		},
 		{
 			"class": "ibmcloud.service.status",
+            "description": "Show the status of a Bluemix service",
 			"emittarget": "ibmcloud.service.status",
 			"texts": [
 				"Can you provide the status for service",
@@ -50,6 +53,7 @@
 		},
 		{
 			"class": "ibmcloud.service.monitor",
+            "description": "Monitor the status of a Bluemix service",
 			"emittarget": "ibmcloud.service.monitor",
 			"texts": [
 				"I want to monitor the status of the service",
