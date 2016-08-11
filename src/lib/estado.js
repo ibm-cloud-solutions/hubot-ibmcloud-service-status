@@ -7,8 +7,7 @@
 'use strict';
 
 var request = require('superagent');
-// Cheerio has memory leaks and cannot be use. Whacko doesn't, but is an abandoned project...
-var whacko = require('whacko');
+var cheerio = require('cheerio');
 var Promise = require('bluebird');
 var nlcconfig = require('hubot-ibmcloud-cognitive-lib').nlcconfig;
 
@@ -58,7 +57,7 @@ function getStatus(domain) {
 				var ok = [];
 				var ko = [];
 				var total = 0;
-				var $ = whacko.load(res);
+				var $ = cheerio.load(res);
 				var serviceNames = [];
 				$('table tr').each(function() {
 					var row = $(this);
@@ -101,7 +100,7 @@ function getServiceStatus(domain, service) {
 	return new Promise(function(resolve, reject) {
 		_getRawStatus(domain).then(function(res) {
 			try {
-				var $ = whacko.load(res);
+				var $ = cheerio.load(res);
 				var status = 'unknown';
 				$('table tr').each(function() {
 					var row = $(this);
