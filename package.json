@@ -23,7 +23,7 @@
     "hubot-ibmcloud-activity-emitter": "latest",
     "hubot-ibmcloud-utils": "latest",
     "superagent": "^1.8.3",
-    "whacko": "^0.19.1"
+    "cheerio": "^0.20.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
