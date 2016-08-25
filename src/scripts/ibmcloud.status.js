@@ -278,10 +278,8 @@ module.exports = function(robot) {
 			let message = i18n.__('cognitive.parse.problem.service');
 			robot.emit('ibmcloud.formatter', { response: res, message: message});
 		}
-		console.log('here1');
 		console.log(region);
 		console.log(service);
-		console.log('here2');
 		if (region && service){
 			serviceStatus(res, region, service);
 		}
