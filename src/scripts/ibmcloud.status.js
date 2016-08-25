@@ -23,6 +23,7 @@ var statusModule = require('../lib/estado');
 var Promise = require('bluebird');
 const cf = require('hubot-cf-convenience');
 const activity = require('hubot-ibmcloud-activity-emitter');
+const entities = require('../lib/status.entities');
 
 
 // --------------------------------------------------------------
@@ -75,6 +76,9 @@ module.exports = function(robot) {
 	})();
 
 	var notificationRequests = [];
+
+	// Register entity handling functions
+	entities.registerEntityFunctions();
 
 	setInterval(function() {
 		if (notificationRequests.length) {
