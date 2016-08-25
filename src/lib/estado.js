@@ -106,7 +106,8 @@ function getServiceStatus(domain, service) {
 					var row = $(this);
 					if (row.attr('class') !== 'info') {
 						var cols = $('td', row);
-						if (cols.first().text() === service) {
+						service = service.toLowerCase();
+						if (cols.first().text().toLowerCase() === service) {
 							status = cols.last().text();
 							return false;
 						}
