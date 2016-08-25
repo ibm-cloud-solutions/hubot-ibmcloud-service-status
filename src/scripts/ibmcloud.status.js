@@ -21,6 +21,7 @@ var TAG = path.basename(__filename);
 
 var statusModule = require('../lib/estado');
 var Promise = require('bluebird');
+const cf = require('hubot-cf-convenience');
 const activity = require('hubot-ibmcloud-activity-emitter');
 
 
@@ -278,10 +279,8 @@ module.exports = function(robot) {
 			let message = i18n.__('cognitive.parse.problem.service');
 			robot.emit('ibmcloud.formatter', { response: res, message: message});
 		}
-		console.log('here1');
 		console.log(region);
 		console.log(service);
-		console.log('here2');
 		if (region && service){
 			serviceStatus(res, region, service);
 		}
@@ -296,7 +295,7 @@ module.exports = function(robot) {
 		robot.logger.debug(`${TAG}: ${SERVICE_STATUS_ID} res.message.text=${res.message.text}.`);
 		var regionInfo = regionForInputText(aRegion);
 		var region = regionInfo.domain;
-		var service = aService;
+		var service = cf.getServiceLabel(aService);
 		robot.logger.info(`${TAG}: Asynch call using status module to check on service ${service} in domain ${region}`);
 		statusModule.getServiceStatus(region, service).then(function(status) {
 			var color = status === 'up' ? COLORS.healthy : COLORS.outage;
@@ -362,7 +361,7 @@ module.exports = function(robot) {
 		var regionInfo = regionForInputText(aRegion);
 		var domain = regionInfo.domain;
 		var status = theStatus;
-		var service = aService;
+		var service = cf.getServiceLabel(aService);
 		if (notificationRequests.length < MAX_NB_OF_NOTIFICATIONS) {
 			notificationRequests.push({
 				timestamp: Date.now(),
