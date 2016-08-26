@@ -24,7 +24,8 @@
 			"parameters" : [
 				{
 					"name": "region",
-					"type": "entity",
+					"title": "region name",
+					"type": "keyword",
 					"prompt": "OK. What region do you want status for *US South*, *United Kingdom*, or *Sydney*?"
 				}
 			]
@@ -41,13 +42,16 @@
 			"parameters" : [
 				{
 					"name": "region",
-					"type": "entity",
+					"title": "region name",
+					"type": "keyword",
 					"prompt": "OK. What region do you want the status for *US South*, *United Kingdom*, or *Sydney*?"
 				},
 				{
 					"name": "service",
+					"title": "service name",
 					"type": "entity",
-					"prompt": "OK. What service do you want the status for?"
+					"prompt": "OK. What service do you want the status for?",
+					"entityfunction": "funcservice"
 				}
 			]
 		},
@@ -64,17 +68,21 @@
 			"parameters" : [
 				{
 					"name": "region",
-					"type": "entity",
+					"title": "region name",
+					"type": "keyword",
 					"prompt": "OK. What region do you want the status for *US South*, *United Kingdom*, or *Sydney*?"
 				},
 				{
 					"name": "service",
+					"title": "service name",
 					"type": "entity",
-					"prompt": "OK. What service do you want the status for?"
+					"prompt": "OK. What service do you want the status for?",
+					"entityfunction": "funcservice"
 				},
 				{
 					"name": "status",
-					"type": "entity",
+					"title": "status",
+					"type": "keyword",
 					"prompt": "OK. What status do you want to be alerted for *up* or *down*?"
 				}
 			]

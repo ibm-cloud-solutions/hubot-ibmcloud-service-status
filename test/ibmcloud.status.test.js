@@ -324,4 +324,61 @@ describe('Test cloud status via Reg Ex', function() {
 			expect(room.messages[1]).to.eql(['hubot', '@mimiron hubot ibmcloud status region [US South | United Kingdom | Sydney] - Provide status for IBM Cloud services in region.\nhubot ibmcloud status service [US South | United Kingdom | Sydney] [SERVICE] - Provide status for IBM Cloud service named [SERVICE] in region.\nhubot ibmcloud status monitor [US South | United Kingdom | Sydney] [UP|DOWN][SERVICE] - Monitor and send notifications when [SERVICE] in region goes [UP|DOWN].\n']);
 		});
 	});
+
+	context('verify entity functions', function() {
+
+		var testGetServices = function(region, expCount, done) {
+			var regionCode = REGIONS[region];
+			nock('http://estado.' + regionCode + '.bluemix.net')
+				.get('/')
+				.reply(200, mockHtml[regionCode]);
+			const entities = require('../src/lib/status.entities');
+			var res = { message: {text: '', user: {id: 'mimiron'}}, response: room };
+			entities.getServices(room.robot, res, 'service', {region: region}).then(function(services) {
+				expect(services.length).to.eql(expCount);
+				done();
+			}).catch(function(error) {
+				done(error);
+			});
+		};
+
+		var testGetServicesError = function(region, done) {
+			var regionCode = REGIONS[region];
+			nock('http://estado.' + regionCode + '.bluemix.net')
+				.get('/')
+				.reply(200, mockHtml[regionCode]);
+			const entities = require('../src/lib/status.entities');
+			var res = { message: {text: '', user: {id: 'mimiron'}}, response: room };
+			entities.getServices(room.robot, res, 'service', {}).then(function(services) {
+				done(new Error('Expected error but did not get one'));
+			}).catch(function(error) {
+				if (error) {
+					done();
+				}
+				else {
+					done(new Error('Catch block invoked, but no error; expected to get one.'));
+				}
+			});
+		};
+
+		it('should retrieve set of services', function(done) {
+			testGetServices('US South', 298, done);
+		});
+
+		it('should retrieve set of services', function(done) {
+			testGetServices('United Kingdom', 237, done);
+		});
+
+		it('should retrieve set of services', function(done) {
+			testGetServices('Sydney', 177, done);
+		});
+
+		it('should retrieve set of services', function(done) {
+			testGetServices('other', 0, done);
+		});
+
+		it('should get error retrieving set of services; no region provided', function(done) {
+			testGetServicesError('US South', done);
+		});
+	});
 });
