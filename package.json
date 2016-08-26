@@ -1,6 +1,6 @@
 {
   "name": "hubot-ibmcloud-service-status",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "description": "Hubot script for obtaining IBM Cloud status for regions and specific service plans.",
   "repository": {
     "url": "https://github.com/ibm-cloud-solutions/hubot-ibmcloud-service-status",
