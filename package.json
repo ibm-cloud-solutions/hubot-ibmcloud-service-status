@@ -19,10 +19,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "bluebird": "^3.4.0",
-    "hubot-cf-convenience": "latest",
-    "hubot-ibmcloud-cognitive-lib": "latest",
-    "hubot-ibmcloud-activity-emitter": "latest",
-    "hubot-ibmcloud-utils": "latest",
     "superagent": "^1.8.3",
     "cheerio": "^0.20.0"
   },
@@ -45,7 +41,11 @@
   },
   "peerDependencies": {
     "hubot": "^2.19.0",
+    "hubot-cf-convenience": "latest",
+    "hubot-ibmcloud-activity-emitter": "latest",
+    "hubot-ibmcloud-cognitive-lib": "latest",
     "hubot-ibmcloud-formatter": ">=0.0.29",
+    "hubot-ibmcloud-utils": "latest",
     "i18n-2": "^0.6.3"
   },
   "engines": {
