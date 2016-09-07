@@ -6,13 +6,13 @@
   */
 'use strict';
 
-var statusModule = require('./estado');
+const statusModule = require('./estado');
 const nlcconfig = require('hubot-ibmcloud-cognitive-lib').nlcconfig;
 
 const NAMESPACE = 'IBMcloudStatus';
 const PARAM_SERVICE = 'service';
 
-var functionsRegistered = false;
+let functionsRegistered = false;
 
 
 function buildGlobalFuncName(parameterName) {
@@ -27,7 +27,7 @@ function registerEntityFunctions() {
 }
 
 function getDomain(region) {
-	var lowercaseText = region.toLowerCase();
+	let lowercaseText = region.toLowerCase();
 	switch (lowercaseText) {
 	case 'us south':
 		return 'ng';
@@ -45,7 +45,7 @@ function getServices(robot, res, parameterName, parameters) {
 		if (parameters.region) {
 			let domain = getDomain(parameters.region);
 			statusModule.getStatus(domain).then(function(result) {
-				var services = result.ok.concat(result.ko).sort();
+				let services = result.ok.concat(result.ko).sort();
 				resolve(services);
 			}).catch(function(err) {
 				reject(err);

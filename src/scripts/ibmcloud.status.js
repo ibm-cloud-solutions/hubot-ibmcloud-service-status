@@ -16,11 +16,11 @@
 
 'use strict';
 
-var path = require('path');
-var TAG = path.basename(__filename);
+const path = require('path');
+const TAG = path.basename(__filename);
 
-var statusModule = require('../lib/estado');
-var Promise = require('bluebird');
+const statusModule = require('../lib/estado');
+const Promise = require('bluebird');
 const cf = require('hubot-cf-convenience');
 const activity = require('hubot-ibmcloud-activity-emitter');
 const entities = require('../lib/status.entities');
@@ -31,7 +31,7 @@ const entities = require('../lib/status.entities');
 // It will read from a peer messages.json file.  Later, these
 // messages can be referenced throughout the module.
 // --------------------------------------------------------------
-var i18n = new (require('i18n-2'))({
+const i18n = new (require('i18n-2'))({
 	locales: ['en'],
 	extension: '.json',
 	directory: __dirname + '/../locales',
@@ -52,20 +52,20 @@ const SERVICE_MONITOR_RE = /ibmcloud\s+status\s+monitor\s+(US South|United Kingd
 const SERVICE_MONITOR_ID = 'ibmcloud.service.monitor';
 
 module.exports = function(robot) {
-	var COLORS = {
+	const COLORS = {
 		healthy: '#008571',
 		outage: '#ef4e38'
 	};
 
-	var NOTIFICATION_PERIOD_IN_MS = Number.parseInt(process.env.NOTIFICATION_PERIOD_IN_MS, 10) || 60000;
-	var NOTIFICATION_TIMEOUT = {
+	let NOTIFICATION_PERIOD_IN_MS = Number.parseInt(process.env.NOTIFICATION_PERIOD_IN_MS, 10) || 60000;
+	let NOTIFICATION_TIMEOUT = {
 		label: process.env.NOTIFICATION_TIMEOUT_LABEL || '8 hours', // eslint-disable-line no-irregular-whitespace
 		value: Number.parseInt(process.env.NOTIFICATION_TIMEOUT_VALUE, 10) || 8 * 60 * 60000
 	};
-	var MAX_NB_OF_NOTIFICATIONS = Number.parseInt(process.env.MAX_NB_OF_NOTIFICATIONS, 10) || 20;
+	let MAX_NB_OF_NOTIFICATIONS = Number.parseInt(process.env.MAX_NB_OF_NOTIFICATIONS, 10) || 20;
 
 	(function() {
-		var logMessage = [
+		let logMessage = [
 			'Using the following notifications settings:',
 			'- Notification period: ' + NOTIFICATION_PERIOD_IN_MS + ' ms',
 			'- Notification timeout: ' + NOTIFICATION_TIMEOUT.value + ' ms',
@@ -75,7 +75,7 @@ module.exports = function(robot) {
 		robot.logger.info(TAG + ': ' + logMessage.join('\n'));
 	})();
 
-	var notificationRequests = [];
+	let notificationRequests = [];
 
 	// Register entity handling functions
 	entities.registerEntityFunctions();
@@ -84,12 +84,13 @@ module.exports = function(robot) {
 		if (notificationRequests.length) {
 			robot.logger.info(`${TAG}: checking service status for ${notificationRequests.length} notification requests`);
 
-			var promises = [];
+			let promises = [];
 			notificationRequests.forEach(function(request) {
 				robot.logger.info(`${TAG}: Promise added to check if service ${request.service} is ${request.status} on domain ${request.domain}`);
 				promises.push(statusModule.getServiceStatus(request.domain, request.service).then(function(lastStatus) {
+					let color;
 					if (request.status === lastStatus) {
-						var color = lastStatus === 'up' ? COLORS.healthy : COLORS.outage;
+						color = lastStatus === 'up' ? COLORS.healthy : COLORS.outage;
 						robot.emit('ibmcloud.formatter', {
 							response: request.res,
 							attachments: [{
@@ -128,9 +129,9 @@ module.exports = function(robot) {
 			robot.logger.info(`${TAG}: Async calls (Promise.all) for service checks (promises).`);
 			Promise.all(promises).then(function(values) {
 				notificationRequests = notificationRequests.filter(function(entry, index) {
-					var inspection = values[index];
+					let inspection = values[index];
 					if (inspection.isFulfilled()) {
-						var value = inspection.value();
+						let value = inspection.value();
 						if (!value) {
 							// delete the bot res object from the notification
 							delete entry.res;
@@ -147,7 +148,7 @@ module.exports = function(robot) {
 	}, NOTIFICATION_PERIOD_IN_MS);
 
 	function regionForInputText(text) {
-		var lowercaseText = text.toLowerCase();
+		let lowercaseText = text.toLowerCase();
 		switch (lowercaseText) {
 		case 'us south':
 			return {
@@ -171,7 +172,7 @@ module.exports = function(robot) {
 		}
 	}
 
-	var reportIssue = function(res, message) {
+	let reportIssue = function(res, message) {
 		robot.logger.error(`${TAG}: An error occurred.`);
 		robot.logger.error(message);
 		let msg = i18n.__('error');
@@ -218,11 +219,11 @@ module.exports = function(robot) {
 	});
 	function regionStatus(res, aRegion) {
 		robot.logger.debug(`${TAG}: ${REGION_STATUS_ID} res.message.text=${res.message.text}.`);
-		var regionInfo = regionForInputText(aRegion);
-		var region = regionInfo.domain;
+		let regionInfo = regionForInputText(aRegion);
+		let region = regionInfo.domain;
 		robot.logger.info(`${TAG}: Asynch call using status module to check on domain ${region}`);
 		statusModule.getStatus(region).then(function(resp) {
-			var attachments = [];
+			let attachments = [];
 			if (resp.ko.length) {
 				attachments.push({
 					title: i18n.__('healthy.region.status', aRegion),
@@ -297,12 +298,12 @@ module.exports = function(robot) {
 	});
 	function serviceStatus(res, aRegion, aService) {
 		robot.logger.debug(`${TAG}: ${SERVICE_STATUS_ID} res.message.text=${res.message.text}.`);
-		var regionInfo = regionForInputText(aRegion);
-		var region = regionInfo.domain;
-		var service = cf.getServiceLabel(aService);
+		let regionInfo = regionForInputText(aRegion);
+		let region = regionInfo.domain;
+		let service = cf.getServiceLabel(aService);
 		robot.logger.info(`${TAG}: Asynch call using status module to check on service ${service} in domain ${region}`);
 		statusModule.getServiceStatus(region, service).then(function(status) {
-			var color = status === 'up' ? COLORS.healthy : COLORS.outage;
+			let color = status === 'up' ? COLORS.healthy : COLORS.outage;
 
 			// Emit the app status as an attachment
 			robot.emit('ibmcloud.formatter', {
@@ -362,10 +363,10 @@ module.exports = function(robot) {
 	});
 	function serviceMonitor(res, aRegion, aService, theStatus) {
 		robot.logger.debug(`${TAG}: ${SERVICE_MONITOR_ID} res.message.text=${res.message.text}.`);
-		var regionInfo = regionForInputText(aRegion);
-		var domain = regionInfo.domain;
-		var status = theStatus;
-		var service = cf.getServiceLabel(aService);
+		let regionInfo = regionForInputText(aRegion);
+		let domain = regionInfo.domain;
+		let status = theStatus;
+		let service = cf.getServiceLabel(aService);
 		if (notificationRequests.length < MAX_NB_OF_NOTIFICATIONS) {
 			notificationRequests.push({
 				timestamp: Date.now(),
