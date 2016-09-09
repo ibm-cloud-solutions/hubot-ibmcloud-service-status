@@ -5,6 +5,24 @@ const path = require('path');
 const Helper = require('hubot-test-helper');
 const expect = require('chai').expect;
 const nock = require('nock');
+const mockUtils = require('./mock.utils.cf.js');
+
+
+// --------------------------------------------------------------
+// i18n (internationalization)
+// It will read from a peer messages.json file.  Later, these
+// messages can be referenced throughout the module.
+// --------------------------------------------------------------
+const i18n = new (require('i18n-2'))({
+	locales: ['en'],
+	extension: '.json',
+	directory: __dirname + '/../src/locales',
+	defaultLocale: 'en',
+	// Prevent messages file from being overwritten in error conditions (like poor JSON).
+	updateFiles: false
+});
+// At some point we need to toggle this setting based on some user input.
+i18n.setLocale('en');
 
 // No cache for the tests
 process.env.CACHE_TIMEOUT = '-1';
@@ -29,9 +47,54 @@ const mockHtml = {
 
 const helper = new Helper(path.join(__dirname, '../src/scripts/ibmcloud.status.js'));
 
+describe('Load modules through index', function() {
+
+	let room;
+	let cf;
+
+	before(function() {
+		mockUtils.setupMockery();
+		// initialize cf, hubot-test-helper doesn't test Middleware
+		cf = require('hubot-cf-convenience');
+		return cf.promise.then();
+	});
+
+	beforeEach(function() {
+		room = helper.createRoom();
+		nock.disableNetConnect();
+		// Force all emits into a reply.
+		room.robot.on('ibmcloud.formatter', function(event) {
+			if (event.message) {
+				event.response.reply(event.message);
+			}
+			else {
+				event.response.send({attachments: event.attachments});
+			}
+		});
+	});
+
+	afterEach(function() {
+		room.destroy();
+	});
+
+	context('load index`', function() {
+		it('should load without problems', function() {
+			require('../index')(room.robot);
+		});
+	});
+});
+
 describe('Test cloud status via Reg Ex', function() {
 
 	let room;
+	let cf;
+
+	before(function() {
+		mockUtils.setupMockery();
+		// initialize cf, hubot-test-helper doesn't test Middleware
+		cf = require('hubot-cf-convenience');
+		return cf.promise.then();
+	});
 
 	beforeEach(function() {
 		room = helper.createRoom();
@@ -72,12 +135,12 @@ describe('Test cloud status via Reg Ex', function() {
 
 		it('returns status for region US South', function(done) {
 			testRegionStatus('US South', [{
-				title: 'US South Region Healthy Services',
+				title: i18n.__('healthy.region.status', 'US South'),
 				title_link: 'http://estado.ng.bluemix.net',
 				color: UP_COLOR,
-				text: '295 healthy services.'
+				text: i18n.__('healthy.services', 295 + '')
 			}, {
-				title: 'US South Region Service Outages',
+				title: i18n.__('unhealthy.region.status', 'US South'),
 				title_link: 'http://estado.ng.bluemix.net',
 				color: DOWN_COLOR,
 				text: '- otc-pipeline-ui\n- messageconnect [experimental]\n- MobileApplicationContentManager [Basic]'
@@ -86,12 +149,12 @@ describe('Test cloud status via Reg Ex', function() {
 
 		it('returns status for region United Kingdom', function(done) {
 			testRegionStatus('United Kingdom', [{
-				title: 'United Kingdom Region Healthy Services',
+				title: i18n.__('healthy.region.status', 'United Kingdom'),
 				title_link: 'http://estado.eu-gb.bluemix.net',
 				color: UP_COLOR,
-				text: '236 healthy services.'
+				text: i18n.__('healthy.services', 236 + '')
 			}, {
-				title: 'United Kingdom Region Service Outages',
+				title: i18n.__('unhealthy.region.status', 'United Kingdom'),
 				title_link: 'http://estado.eu-gb.bluemix.net',
 				color: DOWN_COLOR,
 				text: '- MobileApplicationContentManager [Basic]'
@@ -100,12 +163,12 @@ describe('Test cloud status via Reg Ex', function() {
 
 		it('returns status for region Sydney', function(done) {
 			testRegionStatus('Sydney', [{
-				title: 'Sydney Region Healthy Services',
+				title: i18n.__('healthy.region.status', 'Sydney'),
 				title_link: 'http://estado.au-syd.bluemix.net',
 				color: UP_COLOR,
-				text: '175 healthy services.'
+				text: i18n.__('healthy.services', 175 + '')
 			}, {
-				title: 'Sydney Region Service Outages',
+				title: i18n.__('unhealthy.region.status', 'Sydney'),
 				title_link: 'http://estado.au-syd.bluemix.net',
 				color: DOWN_COLOR,
 				text: '- www\n- MobileApplicationContentManager [Basic]'
@@ -136,7 +199,7 @@ describe('Test cloud status via Reg Ex', function() {
 
 		it('returns status for service www on region US South', function(done) {
 			testServiceStatus('US South', 'www', [{
-				title: 'www in US South Region is up',
+				title: i18n.__('service.region.status', 'www', 'US South', 'up'),
 				title_link: 'http://estado.ng.bluemix.net',
 				color: UP_COLOR
 			}], done);
@@ -144,7 +207,7 @@ describe('Test cloud status via Reg Ex', function() {
 
 		it('returns status for service otc-pipeline-ui on region US South', function(done) {
 			testServiceStatus('US South', 'otc-pipeline-ui', [{
-				title: 'otc-pipeline-ui in US South Region is down',
+				title: i18n.__('service.region.status', 'otc-pipeline-ui', 'US South', 'down'),
 				title_link: 'http://estado.ng.bluemix.net',
 				color: DOWN_COLOR
 			}], done);
@@ -152,7 +215,7 @@ describe('Test cloud status via Reg Ex', function() {
 
 		it('returns status for service Object-Storage-Healthcheck on region United Kingdom', function(done) {
 			testServiceStatus('United Kingdom', 'Object-Storage-Healthcheck', [{
-				title: 'Object-Storage-Healthcheck in United Kingdom Region is up',
+				title: i18n.__('service.region.status', 'Object-Storage-Healthcheck', 'United Kingdom', 'up'),
 				title_link: 'http://estado.eu-gb.bluemix.net',
 				color: UP_COLOR
 			}], done);
@@ -160,7 +223,7 @@ describe('Test cloud status via Reg Ex', function() {
 
 		it('returns status for service MobileApplicationContentManager [Basic] on region United Kingdom', function(done) {
 			testServiceStatus('United Kingdom', 'MobileApplicationContentManager [Basic]', [{
-				title: 'MobileApplicationContentManager [Basic] in United Kingdom Region is down',
+				title: i18n.__('service.region.status', 'MobileApplicationContentManager [Basic]', 'United Kingdom', 'down'),
 				title_link: 'http://estado.eu-gb.bluemix.net',
 				color: DOWN_COLOR
 			}], done);
@@ -168,7 +231,7 @@ describe('Test cloud status via Reg Ex', function() {
 
 		it('returns status for service APIConnect [Essentials] on region Sydney', function(done) {
 			testServiceStatus('Sydney', 'APIConnect [Essentials]', [{
-				title: 'APIConnect [Essentials] in Sydney Region is up',
+				title: i18n.__('service.region.status', 'APIConnect [Essentials]', 'Sydney', 'up'),
 				title_link: 'http://estado.au-syd.bluemix.net',
 				color: UP_COLOR
 			}], done);
@@ -176,7 +239,7 @@ describe('Test cloud status via Reg Ex', function() {
 
 		it('returns status for service www on region Sydney', function(done) {
 			testServiceStatus('Sydney', 'www', [{
-				title: 'www in Sydney Region is down',
+				title: i18n.__('service.region.status', 'www', 'Sydney', 'down'),
 				title_link: 'http://estado.au-syd.bluemix.net',
 				color: DOWN_COLOR
 			}], done);
@@ -184,12 +247,6 @@ describe('Test cloud status via Reg Ex', function() {
 	});
 
 	context('Monitoring service', function() {
-
-		before(function() {
-			process.env.NOTIFICATION_PERIOD_IN_MS = 1000;
-			process.env.NOTIFICATION_TIMEOUT_VALUE = 2000;
-			process.env.NOTIFICATION_TIMEOUT_LABEL = '2 seconds';
-		});
 
 		let testMonitoringServiceStatus = function(region, service, targetStatus, expectedFirstReplyAttachments, expectedSecondReplyAttachments, statusChange, done) {
 			let regionCode = REGIONS[region];
@@ -233,12 +290,12 @@ describe('Test cloud status via Reg Ex', function() {
 			this.timeout(5000);
 			testMonitoringServiceStatus('US South', 'otc-pipeline-ui', 'UP', [{
 				color: UP_COLOR,
-				text: 'otc-pipeline-ui in US South with UP status.',
-				title: 'Service monitoring started'
+				text: i18n.__('monitoring.status', 'otc-pipeline-ui', 'US South', 'UP'),
+				title: i18n.__('monitoring.started')
 			}], [{
 				color: undefined,
-				text: 'The status of service otc-pipeline-ui in region US South is still not UP after 2 seconds (current value: DOWN), Stopping monitor now.',
-				title: 'otc-pipeline-ui in US South Region',
+				text: i18n.__('service.monitoring.status', 'otc-pipeline-ui', 'US South', 'UP', '2 seconds', 'DOWN'),
+				title: i18n.__('service.in.region', 'otc-pipeline-ui', 'US South'),
 				title_link: 'http://estado.ng.bluemix.net'
 			}], false, done);
 		});
@@ -247,12 +304,12 @@ describe('Test cloud status via Reg Ex', function() {
 			this.timeout(5000);
 			testMonitoringServiceStatus('US South', 'otc-pipeline-ui', 'UP', [{
 				color: UP_COLOR,
-				text: 'otc-pipeline-ui in US South with UP status.',
-				title: 'Service monitoring started'
+				text: i18n.__('monitoring.status', 'otc-pipeline-ui', 'US South', 'UP'),
+				title: i18n.__('monitoring.started')
 			}], [{
 				color: UP_COLOR,
-				text: 'Service is UP.',
-				title: 'otc-pipeline-ui in US South Region',
+				text: i18n.__('service.status', 'UP'),
+				title: i18n.__('service.in.region', 'otc-pipeline-ui', 'US South'),
 				title_link: 'http://estado.ng.bluemix.net'
 			}], true, done);
 		});
@@ -261,12 +318,12 @@ describe('Test cloud status via Reg Ex', function() {
 			this.timeout(5000);
 			testMonitoringServiceStatus('United Kingdom', 'MobileApplicationContentManager [Basic]', 'UP', [{
 				color: UP_COLOR,
-				text: 'MobileApplicationContentManager [Basic] in United Kingdom with UP status.',
-				title: 'Service monitoring started'
+				text: i18n.__('monitoring.status', 'MobileApplicationContentManager [Basic]', 'United Kingdom', 'UP'),
+				title: i18n.__('monitoring.started')
 			}], [{
 				color: undefined,
-				text: 'The status of service MobileApplicationContentManager [Basic] in region United Kingdom is still not UP after 2 seconds (current value: DOWN), Stopping monitor now.',
-				title: 'MobileApplicationContentManager [Basic] in United Kingdom Region',
+				text: i18n.__('service.monitoring.status', 'MobileApplicationContentManager [Basic]', 'United Kingdom', 'UP', '2 seconds', 'DOWN'),
+				title: i18n.__('service.in.region', 'MobileApplicationContentManager [Basic]', 'United Kingdom'),
 				title_link: 'http://estado.eu-gb.bluemix.net'
 			}], false, done);
 		});
@@ -275,12 +332,12 @@ describe('Test cloud status via Reg Ex', function() {
 			this.timeout(5000);
 			testMonitoringServiceStatus('United Kingdom', 'MobileApplicationContentManager [Basic]', 'UP', [{
 				color: UP_COLOR,
-				text: 'MobileApplicationContentManager [Basic] in United Kingdom with UP status.',
-				title: 'Service monitoring started'
+				text: i18n.__('monitoring.status', 'MobileApplicationContentManager [Basic]', 'United Kingdom', 'UP'),
+				title: i18n.__('monitoring.started')
 			}], [{
 				color: UP_COLOR,
-				text: 'Service is UP.',
-				title: 'MobileApplicationContentManager [Basic] in United Kingdom Region',
+				text: i18n.__('service.status', 'UP'),
+				title: i18n.__('service.in.region', 'MobileApplicationContentManager [Basic]', 'United Kingdom'),
 				title_link: 'http://estado.eu-gb.bluemix.net'
 			}], true, done);
 		});
@@ -289,12 +346,12 @@ describe('Test cloud status via Reg Ex', function() {
 			this.timeout(5000);
 			testMonitoringServiceStatus('Sydney', 'www', 'UP', [{
 				color: UP_COLOR,
-				text: 'www in Sydney with UP status.',
-				title: 'Service monitoring started'
+				text: i18n.__('monitoring.status', 'www', 'Sydney', 'UP'),
+				title: i18n.__('monitoring.started')
 			}], [{
 				color: undefined,
-				text: 'The status of service www in region Sydney is still not UP after 2 seconds (current value: DOWN), Stopping monitor now.',
-				title: 'www in Sydney Region',
+				text: i18n.__('service.monitoring.status', 'www', 'Sydney', 'UP', '2 seconds', 'DOWN'),
+				title: i18n.__('service.in.region', 'www', 'Sydney'),
 				title_link: 'http://estado.au-syd.bluemix.net'
 			}], false, done);
 		});
@@ -303,13 +360,266 @@ describe('Test cloud status via Reg Ex', function() {
 			this.timeout(5000);
 			testMonitoringServiceStatus('Sydney', 'www', 'UP', [{
 				color: UP_COLOR,
-				text: 'www in Sydney with UP status.',
-				title: 'Service monitoring started'
+				text: i18n.__('monitoring.status', 'www', 'Sydney', 'UP'),
+				title: i18n.__('monitoring.started')
 			}], [{
 				color: UP_COLOR,
-				text: 'Service is UP.',
-				title: 'www in Sydney Region',
+				text: i18n.__('service.status', 'UP'),
+				title: i18n.__('service.in.region', 'www', 'Sydney'),
 				title_link: 'http://estado.au-syd.bluemix.net'
+			}], true, done);
+		});
+	});
+
+	context('Monitoring service with any/clear', function() {
+
+		let testMonitoringServiceStatusAny = function(region, service, expectedFirstReplyAttachments, expectedSecondReplyAttachments, expectedThirdReplyAttachments, expectedFourthReplyAttachments, statusChange, done) {
+			let regionCode = REGIONS[region];
+			if (statusChange) {
+				// First status
+				nock('http://estado.' + regionCode + '.bluemix.net')
+					.get('/')
+					.reply(200, mockHtml[regionCode]);
+				// Second status (same)
+				nock('http://estado.' + regionCode + '.bluemix.net')
+					.get('/')
+					.reply(200, mockHtml[regionCode]);
+				// Third status (updated)
+				nock('http://estado.' + regionCode + '.bluemix.net')
+					.get('/')
+					.reply(200, mockHtml[regionCode + '-updated']);
+				// Fourth status (back to original)
+				nock('http://estado.' + regionCode + '.bluemix.net')
+					.get('/')
+					.reply(200, mockHtml[regionCode]);
+			}
+			else {
+				// Same status four times
+				nock('http://estado.' + regionCode + '.bluemix.net')
+					.get('/')
+					.times(4)
+					.reply(200, mockHtml[regionCode]);
+			}
+			let count = 0;
+			room.robot.on('ibmcloud.formatter', function(event) {
+				count++;
+				try {
+					if (count === 1) {
+						expect(event.attachments).to.deep.equal(expectedFirstReplyAttachments);
+					}
+					else if (count === 2) {
+						expect(event.attachments).to.deep.equal(expectedSecondReplyAttachments);
+						if (!statusChange) {
+							done();
+						}
+					}
+					else if (count === 3) {
+						if (statusChange) {
+							expect(event.attachments).to.deep.equal(expectedThirdReplyAttachments);
+						}
+						else {
+							done(new Error('Unexpected third attachments: ' + event.attachments));
+						}
+					}
+					else if (count === 4) {
+						if (statusChange) {
+							expect(event.attachments).to.deep.equal(expectedFourthReplyAttachments);
+							done();
+						}
+						else {
+							done(new Error('Unexpected fourth attachments: ' + event.attachments));
+						}
+					}
+				}
+				catch (err) {
+					done(err);
+				}
+			});
+			room.user.say('user1', '@hubot ibmcloud status monitor ' + region + ' any ' + service).then(setTimeout(function() {
+				room.user.say('user1', '@hubot ibmcloud status monitor ' + region + ' clear ' + service);
+			}, 4500));
+		};
+
+		it('monitor status for messageconnect [experimental] in US South Region (no status change)', function(done) {
+			this.timeout(5000);
+			testMonitoringServiceStatusAny('US South', 'messageconnect [experimental]', [{
+				color: UP_COLOR,
+				text: i18n.__('monitoring.status.any', 'messageconnect [experimental]', 'US South'),
+				title: i18n.__('monitoring.started')
+			}], [{
+				title: i18n.__('monitoring.stopped', 'messageconnect [experimental]', 'US South'),
+				color: UP_COLOR
+			}], [], [], false, done);
+		});
+
+		it('monitor status for messageconnect [experimental] in US South Region (status change)', function(done) {
+			this.timeout(5000);
+			testMonitoringServiceStatusAny('US South', 'messageconnect [experimental]', [{
+				color: UP_COLOR,
+				text: i18n.__('monitoring.status.any', 'messageconnect [experimental]', 'US South'),
+				title: i18n.__('monitoring.started')
+			}], [{
+				title: i18n.__('service.in.region', 'messageconnect [experimental]', 'US South'),
+				title_link: 'http://estado.ng.bluemix.net',
+				text: i18n.__('service.status', 'UP'),
+				color: UP_COLOR
+			}], [{
+				title: i18n.__('service.in.region', 'messageconnect [experimental]', 'US South'),
+				title_link: 'http://estado.ng.bluemix.net',
+				text: i18n.__('service.status', 'DOWN'),
+				color: DOWN_COLOR
+			}], [{
+				title: i18n.__('monitoring.stopped', 'messageconnect [experimental]', 'US South'),
+				color: UP_COLOR
+			}], true, done);
+		});
+	});
+
+	context('Getting space status', function() {
+
+		let testSpaceStatus = function(region, expectedReplyAttachments, useUpdated, done) {
+			let regionCode = REGIONS[region];
+			nock('http://estado.' + regionCode + '.bluemix.net')
+				.get('/')
+				.reply(200, mockHtml[regionCode + (useUpdated ? '-updated' : '')]);
+			room.robot.on('ibmcloud.formatter', function(event) {
+				try {
+					expect(event.attachments).to.deep.equal(expectedReplyAttachments);
+					done();
+				}
+				catch (err) {
+					done(err);
+				}
+			});
+			room.user.say('user1', '@hubot ibmcloud status space').then();
+		};
+
+		it('returns status for current space (mixed statuses)', function(done) {
+			testSpaceStatus('US South', [{
+				title: i18n.__('healthy.space.status', 'testSpace'),
+				title_link: 'http://estado.ng.bluemix.net',
+				color: UP_COLOR,
+				text: i18n.__('healthy.services', 2 + '')
+			}, {
+				title: i18n.__('unhealthy.space.status', 'testSpace'),
+				title_link: 'http://estado.ng.bluemix.net',
+				color: DOWN_COLOR,
+				text: '- messageconnect [experimental]'
+			}], false, done);
+		});
+
+		it('returns status for current space (all up)', function(done) {
+			testSpaceStatus('US South', [{
+				title: i18n.__('healthy.space.status', 'testSpace'),
+				title_link: 'http://estado.ng.bluemix.net',
+				color: UP_COLOR,
+				fields: [{
+					title: i18n.__('services.doing.well'),
+					value: i18n.__('all.services.up', 3 + '')
+				}]
+			}], true, done);
+		});
+
+	});
+
+	context('Monitoring space', function() {
+
+		let testMonitoringSpace = function(region, expectedFirstReplyAttachments, expectedSecondReplyAttachments, expectedThirdReplyAttachments, expectedFourthReplyAttachments, statusChange, done) {
+			let regionCode = REGIONS[region];
+			if (statusChange) {
+				// First status
+				nock('http://estado.' + regionCode + '.bluemix.net')
+					.get('/')
+					.reply(200, mockHtml[regionCode]);
+				// Second status (same)
+				nock('http://estado.' + regionCode + '.bluemix.net')
+					.get('/')
+					.reply(200, mockHtml[regionCode]);
+				// Third status (updated)
+				nock('http://estado.' + regionCode + '.bluemix.net')
+					.get('/')
+					.reply(200, mockHtml[regionCode + '-updated']);
+				// Fourth status (back to original)
+				nock('http://estado.' + regionCode + '.bluemix.net')
+					.get('/')
+					.reply(200, mockHtml[regionCode]);
+			}
+			else {
+				// Same status four times
+				nock('http://estado.' + regionCode + '.bluemix.net')
+					.get('/')
+					.times(4)
+					.reply(200, mockHtml[regionCode]);
+			}
+			let count = 0;
+			room.robot.on('ibmcloud.formatter', function(event) {
+				count++;
+				try {
+					if (count === 1) {
+						expect(event.attachments).to.deep.equal(expectedFirstReplyAttachments);
+					}
+					else if (count === 2) {
+						expect(event.attachments).to.deep.equal(expectedSecondReplyAttachments);
+						if (!statusChange) {
+							done();
+						}
+					}
+					else if (count === 3) {
+						if (statusChange) {
+							expect(event.attachments).to.deep.equal(expectedThirdReplyAttachments);
+						}
+						else {
+							done(new Error('Unexpected third attachments: ' + event.attachments));
+						}
+					}
+					else if (count === 4) {
+						if (statusChange) {
+							expect(event.attachments).to.deep.equal(expectedFourthReplyAttachments);
+							done();
+						}
+						else {
+							done(new Error('Unexpected fourth attachments: ' + event.attachments));
+						}
+					}
+				}
+				catch (err) {
+					done(err);
+				}
+			});
+			room.user.say('user1', '@hubot ibmcloud status monitor space any').then(setTimeout(function() {
+				room.user.say('user1', '@hubot ibmcloud status monitor space clear');
+			}, 4500));
+		};
+
+		it('monitor space (no status change)', function(done) {
+			this.timeout(7000);
+			testMonitoringSpace('US South', [{
+				color: UP_COLOR,
+				title: i18n.__('monitoring.space.started', 'testSpace')
+			}], [{
+				color: UP_COLOR,
+				title: i18n.__('monitoring.space.stopped', 'testSpace')
+			}], [], [], false, done);
+		});
+
+		it('monitor space (status change)', function(done) {
+			this.timeout(7000);
+			testMonitoringSpace('US South', [{
+				color: UP_COLOR,
+				title: i18n.__('monitoring.space.started', 'testSpace')
+			}], [{
+				title: i18n.__('service.in.space', 'messageconnect [experimental]', 'testSpace'),
+				title_link: 'http://estado.ng.bluemix.net',
+				text: i18n.__('service.status', 'UP'),
+				color: UP_COLOR
+			}], [{
+				title: i18n.__('service.in.space', 'messageconnect [experimental]', 'testSpace'),
+				title_link: 'http://estado.ng.bluemix.net',
+				text: i18n.__('service.status', 'DOWN'),
+				color: DOWN_COLOR
+			}], [{
+				color: UP_COLOR,
+				title: i18n.__('monitoring.space.stopped', 'testSpace')
 			}], true, done);
 		});
 	});
@@ -320,8 +630,13 @@ describe('Test cloud status via Reg Ex', function() {
 		});
 
 		it('should respond with help', function() {
+			let expectedHelp = `hubot ibmcloud status region [US South | United Kingdom | Sydney] - ${i18n.__('ibmcloud.status.region.help')}\n`;
+			expectedHelp += `hubot ibmcloud status service [US South | United Kingdom | Sydney] [SERVICE] - ${i18n.__('ibmcloud.status.service.help')}\n`;
+			expectedHelp += `hubot ibmcloud status monitor [US South | United Kingdom | Sydney] [UP|DOWN|ANY|CLEAR][SERVICE] - ${i18n.__('ibmcloud.status.monitor.help', '|')}\n`;
+			expectedHelp += `hubot ibmcloud status space - ${i18n.__('ibmcloud.status.space.help')}\n`;
+			expectedHelp += `hubot ibmcloud status monitor space [ANY|CLEAR] - ${i18n.__('ibmcloud.status.monitor.space.help', '|')}\n`;
 			expect(room.messages.length).to.eql(2);
-			expect(room.messages[1]).to.eql(['hubot', '@mimiron hubot ibmcloud status region [US South | United Kingdom | Sydney] - Provide status for IBM Cloud services in region.\nhubot ibmcloud status service [US South | United Kingdom | Sydney] [SERVICE] - Provide status for IBM Cloud service named [SERVICE] in region.\nhubot ibmcloud status monitor [US South | United Kingdom | Sydney] [UP|DOWN][SERVICE] - Monitor and send notifications when [SERVICE] in region goes [UP|DOWN].\n']);
+			expect(room.messages[1]).to.eql(['hubot', `@mimiron ${expectedHelp}`]);
 		});
 	});
 

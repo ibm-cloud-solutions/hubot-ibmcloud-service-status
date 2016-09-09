@@ -31,7 +31,16 @@ If you are new to Hubot visit the [getting started](https://hubot.github.com/doc
 - `hubot ibmcloud status help` - Show available ibmcloud status commands.
 - `hubot ibmcloud status region [US South | United Kingdom | Sydney]` - Provide status for ibmcloud services in region.
 - `hubot ibmcloud status service [US South | United Kingdom | Sydney] [SERVICE]` - Provide status for ibmcloud service named [SERVICE] in region.
-- `hubot ibmcloud status monitor [US South | United Kingdom | Sydney] [UP|DOWN][SERVICE]` - Monitor and send notifications when [SERVICE] in region goes [UP|DOWN].
+- `hubot ibmcloud status monitor [US South | United Kingdom | Sydney] [UP|DOWN|ANY|CLEAR][SERVICE]` - Monitor and send notifications when [SERVICE] in region goes [UP|DOWN].
+- `hubot ibmcloud status space` - Provide status for ibmcloud services in the current space.
+- `hubot ibmcloud status monitor space [ANY|CLEAR]` - Monitor and send notifications when any service in the current space goes [UP|DOWN].
+
+There are two ways to monitor services:
+
+1. Setting a one-time notification using the UP or DOWN status on the monitor service command.  If the status for the service is checked and its value matches the value specified on the command, then a notification message is displayed and the monitoring of that service is stopped.
+2. Setting a persistent notification using the ANY status.  Each time the status of the service transitions from up to down or from down to up, then a notification message is displayed.  The persistent monitoring for the service can be stopped by issuing the monitor command with the CLEAR status.
+
+There is only one way to monitor the services in the current space and that is using the ANY and CLEAR statuses to enable and disable persistent monitoring for all services in the current space.  One-time notification is not supported for spaces.
 
 ## Hubot Adapter Setup
 
