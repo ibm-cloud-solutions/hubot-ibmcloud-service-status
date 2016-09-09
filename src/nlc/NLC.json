@@ -61,9 +61,12 @@
 			"emittarget": "ibmcloud.service.monitor",
 			"texts": [
 				"I want to monitor the status of the service",
+				"I no longer want to monitor the status of the service",
 				"Notify me when the service health changes",
 				"Alert me when a service goes down",
-				"Tell me when a service comes back up"
+				"Tell me when a service comes back up",
+				"Notify me of any service status changes",
+				"Clear all service status changes"
 			],
 			"parameters" : [
 				{
@@ -83,7 +86,39 @@
 					"name": "status",
 					"title": "status",
 					"type": "keyword",
-					"prompt": "OK. What status do you want to be alerted for *up* or *down*?"
+					"prompt": "OK. What status do you want to be alerted for *up*, *down* or *any* status changes or do you want to *clear* the alert?"
+				}
+			]
+		},
+		{
+			"class": "ibmcloud.space.status",
+			"description": "Show the status of Bluemix services in the current space",
+			"emittarget": "ibmcloud.space.status",
+			"texts": [
+				"Can you provide the status for services in the current space",
+				"Please obtain the status of my services",
+				"health of the services in my space"
+			]
+		},
+		{
+			"class": "ibmcloud.space.monitor",
+			"description": "Monitor the status of Bluemix services in the current space",
+			"emittarget": "ibmcloud.space.monitor",
+			"texts": [
+				"I want to monitor the status of the services in the current space",
+				"I no longer want to monitor the status of the services in the current space",
+				"Notify me when health changes for services in the current space",
+				"Alert me when services in my space go down",
+				"Tell me when a services in my space come back up",
+				"Notify me of any service status changes in the current space",
+				"Clear all service status changes in the current space"
+			],
+			"parameters" : [
+				{
+					"name": "spacestatus",
+					"title": "status",
+					"type": "keyword",
+					"prompt": "OK. What status do you want to be alerted for *any* status changes or *clear* the alerts for the current space?"
 				}
 			]
 		}
@@ -99,7 +134,11 @@
 		},
 		{
 			"name": "status",
-			"values": ["up", "down"]
+			"values": ["up", "down", "any", "clear"]
+		},
+		{
+			"name": "spacestatus",
+			"values": ["any", "clear"]
 		}
 	]
 }

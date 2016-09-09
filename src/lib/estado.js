@@ -8,7 +8,6 @@
 
 var request = require('superagent');
 var cheerio = require('cheerio');
-var Promise = require('bluebird');
 var nlcconfig = require('hubot-ibmcloud-cognitive-lib').nlcconfig;
 
 var CACHE_TIMEOUT = Number.parseInt(process.env.CACHE_TIMEOUT, 10) || 60000;

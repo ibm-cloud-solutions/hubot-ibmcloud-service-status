@@ -12,13 +12,12 @@
     "slack": "source config/env && hubot -a slack",
     "facebook": "source config/env && hubot -a fb",
     "postinstall": "initDb src/nlc/NLC.json",
-    "test": "mocha --require coffee-script/register --compilers coffee:coffee-script test",
-    "coverage": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+    "test": ". test/.env && mocha --require coffee-script/register --compilers coffee:coffee-script test",
+    "coverage": ". test/.env && istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
   },
   "author": "ibm-cloud-solutions",
   "license": "Apache-2.0",
   "dependencies": {
-    "bluebird": "^3.4.0",
     "superagent": "^1.8.3",
     "cheerio": "^0.20.0"
   },
@@ -41,11 +40,11 @@
   },
   "peerDependencies": {
     "hubot": "^2.19.0",
-    "hubot-cf-convenience": ">=0.0.13",
-    "hubot-ibmcloud-activity-emitter": ">=0.0.3",
-    "hubot-ibmcloud-cognitive-lib": ">=0.0.40",
-    "hubot-ibmcloud-formatter": ">=0.0.29",
-    "hubot-ibmcloud-utils": ">=0.0.14",
+    "hubot-cf-convenience": ">=0.0.x",
+    "hubot-ibmcloud-activity-emitter": ">=0.0.x",
+    "hubot-ibmcloud-cognitive-lib": ">=0.0.41",
+    "hubot-ibmcloud-formatter": ">=0.0.x",
+    "hubot-ibmcloud-utils": ">=0.0.x",
     "i18n-2": "^0.6.3"
   },
   "engines": {

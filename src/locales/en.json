@@ -1,22 +1,31 @@
 {
 	"estado.error": "Sorry, an error occured while attempting to collect IBM Cloud status information.",
 	"service.in.region": "%s in %s Region",
+	"service.in.space": "%s in %s Space",
 	"service.status": "Service is %s.",
 	"service.monitoring.status": "The status of service %s in region %s is still not %s after %s (current value: %s), Stopping monitor now.",
 	"healthy.region.status": "%s Region Healthy Services",
+	"healthy.space.status": "%s Space Healthy Services",
 	"healthy.services": "%s healthy services.",
 	"unhealthy.region.status": "%s Region Service Outages",
+	"unhealthy.space.status": "%s Space Service Outages",
 	"services.doing.well": "Services doing well",
 	"all.services.up": "All %s services are healthy.",
 	"service.region.status": "%s in %s Region is %s",
 	"monitoring.started": "Service monitoring started",
 	"monitoring.status": "%s in %s with %s status.",
-	"max.registered": "Sorry, too many notifications are already registered.",
+	"monitoring.status.any": "%s in %s with any status change.",
+	"monitoring.stopped": "Service monitoring stopped for %s in %s",
+	"monitoring.space.started": "Service monitoring for any status change in %s space started",
+	"monitoring.space.stopped": "Service monitoring for %s space stopped",
 	"ibmcloud.status.region.help": "Provide status for IBM Cloud services in region.",
 	"ibmcloud.status.service.help": "Provide status for IBM Cloud service named [SERVICE] in region.",
 	"ibmcloud.status.monitor.help": "Monitor and send notifications when [SERVICE] in region goes [UP%sDOWN].",
+	"ibmcloud.status.space.help": "Provide status for IBM Cloud services in the active space.",
+	"ibmcloud.status.monitor.space.help": "Monitor and send notifications when services in the active space go [UP%sDOWN].",
 
 	"cognitive.parse.problem.region": "I'm having problems understanding the IBM Cloud region it should be *US South*, *United Kingdom*, or *Sydney*.",
 	"cognitive.parse.problem.service": "I'm having problems understanding the IBM Cloud service that you want the status on.",
-	"cognitive.parse.problem.status": "I'm having problems understanding the status type you want to be alerted on *up* or *down*. To monitor a service use *ibmcloud status monitor [US South | United Kingdom | Sydney] [UP|DOWN][SERVICE]*"
+	"cognitive.parse.problem.status": "I'm having problems understanding the status type you want to be alerted on *up*, *down*, or *any*. To monitor a service use *ibmcloud status monitor [US South | United Kingdom | Sydney] [UP|DOWN|ANY|CLEAR][SERVICE]*",
+	"cognitive.parse.problem.spacestatus": "I'm having problems understanding the status type you want to be alerted on. To monitor all services in the current space use *ibmcloud status monitor space [ANY|CLEAR]*"
 }
