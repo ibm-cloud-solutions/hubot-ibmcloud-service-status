@@ -44,7 +44,7 @@ There is only one way to monitor the services in the current space and that is u
 
 ## Hubot Adapter Setup
 
-Hubot supports a variety of adapters to connect to popular chat clients.  For more feature rich experiences you can setup the following adapters:
+Hubot supports a variety of adapters to connect to popular chat clients.  For more feature rich experiences, you can setup the following adapters:
 - [Slack setup](https://github.com/ibm-cloud-solutions/hubot-ibmcloud-service-status/blob/master/docs/adapters/slack.md)
 - [Facebook Messenger setup](https://github.com/ibm-cloud-solutions/hubot-ibmcloud-service-status/blob/master/docs/adapters/facebook.md)
 
