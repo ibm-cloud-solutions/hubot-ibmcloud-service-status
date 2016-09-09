@@ -6,15 +6,15 @@
  */
 'use strict';
 
-var request = require('superagent');
-var cheerio = require('cheerio');
-var nlcconfig = require('hubot-ibmcloud-cognitive-lib').nlcconfig;
+const request = require('superagent');
+const cheerio = require('cheerio');
+const nlcconfig = require('hubot-ibmcloud-cognitive-lib').nlcconfig;
 
-var CACHE_TIMEOUT = Number.parseInt(process.env.CACHE_TIMEOUT, 10) || 60000;
+const CACHE_TIMEOUT = Number.parseInt(process.env.CACHE_TIMEOUT, 10) || 60000;
 
 console.log('Using cache timeout of ' + CACHE_TIMEOUT + ' ms');
 
-var _lastStatus = {
+let _lastStatus = {
 	ng: undefined,
 	'eu-gb': undefined,
 	'au-syd': undefined
@@ -53,17 +53,17 @@ function getStatus(domain) {
 	return new Promise(function(resolve, reject) {
 		_getRawStatus(domain).then(function(res) {
 			try {
-				var ok = [];
-				var ko = [];
-				var total = 0;
-				var $ = cheerio.load(res);
-				var serviceNames = [];
+				let ok = [];
+				let ko = [];
+				let total = 0;
+				let $ = cheerio.load(res);
+				let serviceNames = [];
 				$('table tr').each(function() {
-					var row = $(this);
+					let row = $(this);
 					if (row.attr('class') !== 'info') {
-						var cols = $('td', row);
-						var service = cols.first().text();
-						var stat = cols.last().text();
+						let cols = $('td', row);
+						let service = cols.first().text();
+						let stat = cols.last().text();
 						serviceNames.push(service);
 						total++;
 						if (stat !== 'up') {
@@ -99,12 +99,12 @@ function getServiceStatus(domain, service) {
 	return new Promise(function(resolve, reject) {
 		_getRawStatus(domain).then(function(res) {
 			try {
-				var $ = cheerio.load(res);
-				var status = 'unknown';
+				let $ = cheerio.load(res);
+				let status = 'unknown';
 				$('table tr').each(function() {
-					var row = $(this);
+					let row = $(this);
 					if (row.attr('class') !== 'info') {
-						var cols = $('td', row);
+						let cols = $('td', row);
 						service = service.toLowerCase();
 						if (cols.first().text().toLowerCase() === service) {
 							status = cols.last().text();

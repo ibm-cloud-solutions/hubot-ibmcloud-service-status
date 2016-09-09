@@ -1,10 +1,10 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var Helper = require('hubot-test-helper');
-var expect = require('chai').expect;
-var nock = require('nock');
+const fs = require('fs');
+const path = require('path');
+const Helper = require('hubot-test-helper');
+const expect = require('chai').expect;
+const nock = require('nock');
 const mockUtils = require('./mock.utils.cf.js');
 
 
@@ -13,7 +13,7 @@ const mockUtils = require('./mock.utils.cf.js');
 // It will read from a peer messages.json file.  Later, these
 // messages can be referenced throughout the module.
 // --------------------------------------------------------------
-var i18n = new (require('i18n-2'))({
+const i18n = new (require('i18n-2'))({
 	locales: ['en'],
 	extension: '.json',
 	directory: __dirname + '/../src/locales',
@@ -27,16 +27,16 @@ i18n.setLocale('en');
 // No cache for the tests
 process.env.CACHE_TIMEOUT = '-1';
 
-var UP_COLOR = '#008571';
-var DOWN_COLOR = '#ef4e38';
+const UP_COLOR = '#008571';
+const DOWN_COLOR = '#ef4e38';
 
-var REGIONS = {
+const REGIONS = {
 	'US South': 'ng',
 	'United Kingdom': 'eu-gb',
 	Sydney: 'au-syd'
 };
 
-var mockHtml = {
+const mockHtml = {
 	ng: fs.readFileSync(path.join(__dirname, 'resources/estado-ng.html'), {encoding: 'UTF-8'}),
 	'ng-updated': fs.readFileSync(path.join(__dirname, 'resources/estado-ng-updated.html'), {encoding: 'UTF-8'}),
 	'eu-gb': fs.readFileSync(path.join(__dirname, 'resources/estado-eu-gb.html'), {encoding: 'UTF-8'}),
@@ -45,11 +45,11 @@ var mockHtml = {
 	'au-syd-updated': fs.readFileSync(path.join(__dirname, 'resources/estado-au-syd-updated.html'), {encoding: 'UTF-8'})
 };
 
-var helper = new Helper(path.join(__dirname, '../src/scripts/ibmcloud.status.js'));
+const helper = new Helper(path.join(__dirname, '../src/scripts/ibmcloud.status.js'));
 
 describe('Load modules through index', function() {
 
-	var room;
+	let room;
 	let cf;
 
 	before(function() {
@@ -86,7 +86,7 @@ describe('Load modules through index', function() {
 
 describe('Test cloud status via Reg Ex', function() {
 
-	var room;
+	let room;
 	let cf;
 
 	before(function() {
@@ -116,8 +116,8 @@ describe('Test cloud status via Reg Ex', function() {
 
 	context('Getting region status', function() {
 
-		var testRegionStatus = function(region, expectedReplyAttachments, done) {
-			var regionCode = REGIONS[region];
+		let testRegionStatus = function(region, expectedReplyAttachments, done) {
+			let regionCode = REGIONS[region];
 			nock('http://estado.' + regionCode + '.bluemix.net')
 				.get('/')
 				.reply(200, mockHtml[regionCode]);
@@ -180,8 +180,8 @@ describe('Test cloud status via Reg Ex', function() {
 
 	context('Getting service status', function() {
 
-		var testServiceStatus = function(region, service, expectedReplyAttachments, done) {
-			var regionCode = REGIONS[region];
+		let testServiceStatus = function(region, service, expectedReplyAttachments, done) {
+			let regionCode = REGIONS[region];
 			nock('http://estado.' + regionCode + '.bluemix.net')
 				.get('/')
 				.reply(200, mockHtml[regionCode]);
@@ -248,8 +248,8 @@ describe('Test cloud status via Reg Ex', function() {
 
 	context('Monitoring service', function() {
 
-		var testMonitoringServiceStatus = function(region, service, targetStatus, expectedFirstReplyAttachments, expectedSecondReplyAttachments, statusChange, done) {
-			var regionCode = REGIONS[region];
+		let testMonitoringServiceStatus = function(region, service, targetStatus, expectedFirstReplyAttachments, expectedSecondReplyAttachments, statusChange, done) {
+			let regionCode = REGIONS[region];
 			if (statusChange) {
 				// First status
 				nock('http://estado.' + regionCode + '.bluemix.net')
@@ -267,7 +267,7 @@ describe('Test cloud status via Reg Ex', function() {
 					.times(2)
 					.reply(200, mockHtml[regionCode]);
 			}
-			var count = 0;
+			let count = 0;
 			room.robot.on('ibmcloud.formatter', function(event) {
 				count++;
 				try {
@@ -373,8 +373,8 @@ describe('Test cloud status via Reg Ex', function() {
 
 	context('Monitoring service with any/clear', function() {
 
-		var testMonitoringServiceStatusAny = function(region, service, expectedFirstReplyAttachments, expectedSecondReplyAttachments, expectedThirdReplyAttachments, expectedFourthReplyAttachments, statusChange, done) {
-			var regionCode = REGIONS[region];
+		let testMonitoringServiceStatusAny = function(region, service, expectedFirstReplyAttachments, expectedSecondReplyAttachments, expectedThirdReplyAttachments, expectedFourthReplyAttachments, statusChange, done) {
+			let regionCode = REGIONS[region];
 			if (statusChange) {
 				// First status
 				nock('http://estado.' + regionCode + '.bluemix.net')
@@ -400,7 +400,7 @@ describe('Test cloud status via Reg Ex', function() {
 					.times(4)
 					.reply(200, mockHtml[regionCode]);
 			}
-			var count = 0;
+			let count = 0;
 			room.robot.on('ibmcloud.formatter', function(event) {
 				count++;
 				try {
@@ -477,8 +477,8 @@ describe('Test cloud status via Reg Ex', function() {
 
 	context('Getting space status', function() {
 
-		var testSpaceStatus = function(region, expectedReplyAttachments, useUpdated, done) {
-			var regionCode = REGIONS[region];
+		let testSpaceStatus = function(region, expectedReplyAttachments, useUpdated, done) {
+			let regionCode = REGIONS[region];
 			nock('http://estado.' + regionCode + '.bluemix.net')
 				.get('/')
 				.reply(200, mockHtml[regionCode + (useUpdated ? '-updated' : '')]);
@@ -524,8 +524,8 @@ describe('Test cloud status via Reg Ex', function() {
 
 	context('Monitoring space', function() {
 
-		var testMonitoringSpace = function(region, expectedFirstReplyAttachments, expectedSecondReplyAttachments, expectedThirdReplyAttachments, expectedFourthReplyAttachments, statusChange, done) {
-			var regionCode = REGIONS[region];
+		let testMonitoringSpace = function(region, expectedFirstReplyAttachments, expectedSecondReplyAttachments, expectedThirdReplyAttachments, expectedFourthReplyAttachments, statusChange, done) {
+			let regionCode = REGIONS[region];
 			if (statusChange) {
 				// First status
 				nock('http://estado.' + regionCode + '.bluemix.net')
@@ -551,7 +551,7 @@ describe('Test cloud status via Reg Ex', function() {
 					.times(4)
 					.reply(200, mockHtml[regionCode]);
 			}
-			var count = 0;
+			let count = 0;
 			room.robot.on('ibmcloud.formatter', function(event) {
 				count++;
 				try {
@@ -642,13 +642,13 @@ describe('Test cloud status via Reg Ex', function() {
 
 	context('verify entity functions', function() {
 
-		var testGetServices = function(region, expCount, done) {
-			var regionCode = REGIONS[region];
+		let testGetServices = function(region, expCount, done) {
+			let regionCode = REGIONS[region];
 			nock('http://estado.' + regionCode + '.bluemix.net')
 				.get('/')
 				.reply(200, mockHtml[regionCode]);
 			const entities = require('../src/lib/status.entities');
-			var res = { message: {text: '', user: {id: 'mimiron'}}, response: room };
+			let res = { message: {text: '', user: {id: 'mimiron'}}, response: room };
 			entities.getServices(room.robot, res, 'service', {region: region}).then(function(services) {
 				expect(services.length).to.eql(expCount);
 				done();
@@ -657,13 +657,13 @@ describe('Test cloud status via Reg Ex', function() {
 			});
 		};
 
-		var testGetServicesError = function(region, done) {
-			var regionCode = REGIONS[region];
+		let testGetServicesError = function(region, done) {
+			let regionCode = REGIONS[region];
 			nock('http://estado.' + regionCode + '.bluemix.net')
 				.get('/')
 				.reply(200, mockHtml[regionCode]);
 			const entities = require('../src/lib/status.entities');
-			var res = { message: {text: '', user: {id: 'mimiron'}}, response: room };
+			let res = { message: {text: '', user: {id: 'mimiron'}}, response: room };
 			entities.getServices(room.robot, res, 'service', {}).then(function(services) {
 				done(new Error('Expected error but did not get one'));
 			}).catch(function(error) {

@@ -1,10 +1,10 @@
 'use strict';
 
-var fs = require('fs');
-var path = require('path');
-var Helper = require('hubot-test-helper');
-var expect = require('chai').expect;
-var nock = require('nock');
+const fs = require('fs');
+const path = require('path');
+const Helper = require('hubot-test-helper');
+const expect = require('chai').expect;
+const nock = require('nock');
 const mockUtils = require('./mock.utils.cf.js');
 
 
@@ -13,7 +13,7 @@ const mockUtils = require('./mock.utils.cf.js');
 // It will read from a peer messages.json file.  Later, these
 // messages can be referenced throughout the module.
 // --------------------------------------------------------------
-var i18n = new (require('i18n-2'))({
+const i18n = new (require('i18n-2'))({
 	locales: ['en'],
 	extension: '.json',
 	directory: __dirname + '/../src/locales',
@@ -27,16 +27,16 @@ i18n.setLocale('en');
 // No cache for the tests
 process.env.CACHE_TIMEOUT = '-1';
 
-var UP_COLOR = '#008571';
-var DOWN_COLOR = '#ef4e38';
+const UP_COLOR = '#008571';
+const DOWN_COLOR = '#ef4e38';
 
-var REGIONS = {
+const REGIONS = {
 	'US South': 'ng',
 	'United Kingdom': 'eu-gb',
 	Sydney: 'au-syd'
 };
 
-var mockHtml = {
+const mockHtml = {
 	ng: fs.readFileSync(path.join(__dirname, 'resources/estado-ng.html'), {encoding: 'UTF-8'}),
 	'ng-updated': fs.readFileSync(path.join(__dirname, 'resources/estado-ng-updated.html'), {encoding: 'UTF-8'}),
 	'eu-gb': fs.readFileSync(path.join(__dirname, 'resources/estado-eu-gb.html'), {encoding: 'UTF-8'}),
@@ -45,11 +45,11 @@ var mockHtml = {
 	'au-syd-updated': fs.readFileSync(path.join(__dirname, 'resources/estado-au-syd-updated.html'), {encoding: 'UTF-8'})
 };
 
-var helper = new Helper(path.join(__dirname, '../src/scripts/ibmcloud.status.js'));
+const helper = new Helper(path.join(__dirname, '../src/scripts/ibmcloud.status.js'));
 
 describe('Test cloud status via Natural Language', function() {
 
-	var room;
+	let room;
 	let cf;
 
 	before(function() {
@@ -70,8 +70,8 @@ describe('Test cloud status via Natural Language', function() {
 
 	context('Getting region status', function() {
 
-		var testRegionStatus = function(region, expectedReplyAttachments, done) {
-			var regionCode = REGIONS[region];
+		let testRegionStatus = function(region, expectedReplyAttachments, done) {
+			let regionCode = REGIONS[region];
 			nock('http://estado.' + regionCode + '.bluemix.net')
 				.get('/')
 				.reply(200, mockHtml[regionCode]);
@@ -86,7 +86,7 @@ describe('Test cloud status via Natural Language', function() {
 					done(err);
 				}
 			});
-			var res = { message: {text: 'Show me the region status of' + region, user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Show me the region status of' + region, user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.region.status', res, {region: region});
 		};
 
@@ -139,15 +139,15 @@ describe('Test cloud status via Natural Language', function() {
 				expect(event.message).to.eql(i18n.__('cognitive.parse.problem.region'));
 				done();
 			});
-			var res = { message: {text: 'Show me the region status', user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Show me the region status', user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.region.status', res, {});
 		});
 	});
 
 	context('Getting service status', function() {
 
-		var testServiceStatus = function(region, service, expectedReplyAttachments, done) {
-			var regionCode = REGIONS[region];
+		let testServiceStatus = function(region, service, expectedReplyAttachments, done) {
+			let regionCode = REGIONS[region];
 			nock('http://estado.' + regionCode + '.bluemix.net')
 				.get('/')
 				.reply(200, mockHtml[regionCode]);
@@ -163,7 +163,7 @@ describe('Test cloud status via Natural Language', function() {
 				}
 			});
 
-			var res = { message: {text: 'Please obtain the status of service ' + service + 'in region ' + region, user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Please obtain the status of service ' + service + 'in region ' + region, user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.service.status', res, {region: region, service: service});
 		};
 
@@ -221,7 +221,7 @@ describe('Test cloud status via Natural Language', function() {
 				expect(event.message).to.eql(i18n.__('cognitive.parse.problem.service'));
 				done();
 			});
-			var res = { message: {text: 'Please obtain the status in region US South', user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Please obtain the status in region US South', user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.service.status', res, {region: 'US South'});
 		});
 
@@ -231,15 +231,15 @@ describe('Test cloud status via Natural Language', function() {
 				expect(event.message).to.eql(i18n.__('cognitive.parse.problem.region'));
 				done();
 			});
-			var res = { message: {text: 'Please obtain the status of service www', user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Please obtain the status of service www', user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.service.status', res, {service: 'www'});
 		});
 	});
 
 	context('Monitoring service', function() {
 
-		var testMonitoringServiceStatus = function(region, service, targetStatus, expectedFirstReplyAttachments, expectedSecondReplyAttachments, statusChange, done) {
-			var regionCode = REGIONS[region];
+		let testMonitoringServiceStatus = function(region, service, targetStatus, expectedFirstReplyAttachments, expectedSecondReplyAttachments, statusChange, done) {
+			let regionCode = REGIONS[region];
 			if (statusChange) {
 				// First status
 				nock('http://estado.' + regionCode + '.bluemix.net')
@@ -257,7 +257,7 @@ describe('Test cloud status via Natural Language', function() {
 					.times(2)
 					.reply(200, mockHtml[regionCode]);
 			}
-			var count = 0;
+			let count = 0;
 			room.robot.on('ibmcloud.formatter', function(event) {
 				count++;
 				try {
@@ -273,7 +273,7 @@ describe('Test cloud status via Natural Language', function() {
 					done(err);
 				}
 			});
-			var res = { message: {text: 'Notify me when the service health changes ' + service + 'in region ' + region, user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Notify me when the service health changes ' + service + 'in region ' + region, user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.service.monitor', res, {region: region, service: service, status: targetStatus});
 		};
 
@@ -367,7 +367,7 @@ describe('Test cloud status via Natural Language', function() {
 				expect(event.message).to.eql(i18n.__('cognitive.parse.problem.region'));
 				done();
 			});
-			var res = { message: {text: 'Notify me when the service health changes www', user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Notify me when the service health changes www', user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.service.monitor', res, {service: 'www', status: 'up'});
 		});
 
@@ -377,7 +377,7 @@ describe('Test cloud status via Natural Language', function() {
 				expect(event.message).to.eql(i18n.__('cognitive.parse.problem.service'));
 				done();
 			});
-			var res = { message: {text: 'Notify me when the service health changes in region US South', user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Notify me when the service health changes in region US South', user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.service.monitor', res, {region: 'US South', status: 'up'});
 		});
 
@@ -387,15 +387,15 @@ describe('Test cloud status via Natural Language', function() {
 				expect(event.message).to.eql(i18n.__('cognitive.parse.problem.status'));
 				done();
 			});
-			var res = { message: {text: 'Notify me when the service health changes www in region US South', user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Notify me when the service health changes www in region US South', user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.service.monitor', res, {region: 'US South', service: 'www'});
 		});
 	});
 
 	context('Getting space status', function() {
 
-		var testSpaceStatus = function(region, expectedReplyAttachments, useUpdated, done) {
-			var regionCode = REGIONS[region];
+		let testSpaceStatus = function(region, expectedReplyAttachments, useUpdated, done) {
+			let regionCode = REGIONS[region];
 			nock('http://estado.' + regionCode + '.bluemix.net')
 				.get('/')
 				.reply(200, mockHtml[regionCode + (useUpdated ? '-updated' : '')]);
@@ -409,7 +409,7 @@ describe('Test cloud status via Natural Language', function() {
 				}
 			});
 
-			var res = { message: {text: 'Please obtain the status of the services in the current space', user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Please obtain the status of the services in the current space', user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.space.status', res, {});
 		};
 
@@ -452,12 +452,12 @@ describe('Test cloud status via Natural Language', function() {
 				title: i18n.__('monitoring.space.stopped', 'testSpace'),
 				color: UP_COLOR
 			}];
-			var count = 0;
+			let count = 0;
 			room.robot.on('ibmcloud.formatter', function(event) {
 				count++;
 				if (count === 1) {
 					expect(event.attachments).to.deep.equal(expectedFirstReplyAttachments);
-					var res2 = { message: {text: 'Stop notifying me when the service health changes in region US South', user: {id: 'anId'}}, response: room };
+					let res2 = { message: {text: 'Stop notifying me when the service health changes in region US South', user: {id: 'anId'}}, response: room };
 					room.robot.emit('ibmcloud.space.monitor', res2, {spacestatus: 'clear'});
 				}
 				else if (count === 2) {
@@ -465,7 +465,7 @@ describe('Test cloud status via Natural Language', function() {
 					done();
 				}
 			});
-			var res = { message: {text: 'Notify me when the service health changes in region US South', user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Notify me when the service health changes in region US South', user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.space.monitor', res, {spacestatus: 'any'});
 		});
 
@@ -475,7 +475,7 @@ describe('Test cloud status via Natural Language', function() {
 				expect(event.message).to.eql(i18n.__('cognitive.parse.problem.spacestatus'));
 				done();
 			});
-			var res = { message: {text: 'Notify me when services in the current space change status', user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'Notify me when services in the current space change status', user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.space.monitor', res, {});
 		});
 	});
@@ -490,7 +490,7 @@ describe('Test cloud status via Natural Language', function() {
 					done();
 				}
 			});
-			var res = { message: {text: 'help cloud status', user: {id: 'anId'}}, response: room };
+			let res = { message: {text: 'help cloud status', user: {id: 'anId'}}, response: room };
 			room.robot.emit('ibmcloud.status.help', res, {});
 		});
 	});

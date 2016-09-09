@@ -16,10 +16,10 @@
 
 'use strict';
 
-var path = require('path');
-var TAG = path.basename(__filename);
+const path = require('path');
+const TAG = path.basename(__filename);
 
-var statusModule = require('../lib/estado');
+const statusModule = require('../lib/estado');
 const cf = require('hubot-cf-convenience');
 const activity = require('hubot-ibmcloud-activity-emitter');
 const entities = require('../lib/status.entities');
@@ -30,7 +30,7 @@ const entities = require('../lib/status.entities');
 // It will read from a peer messages.json file.  Later, these
 // messages can be referenced throughout the module.
 // --------------------------------------------------------------
-var i18n = new (require('i18n-2'))({
+const i18n = new (require('i18n-2'))({
 	locales: ['en'],
 	extension: '.json',
 	directory: __dirname + '/../locales',
@@ -55,19 +55,19 @@ const SPACE_MONITOR_RE = /ibmcloud\s+status\s+monitor\s+space\s+(any|clear)/i;
 const SPACE_MONITOR_ID = 'ibmcloud.space.monitor';
 
 module.exports = function(robot) {
-	var COLORS = {
+	const COLORS = {
 		healthy: '#008571',
 		outage: '#ef4e38'
 	};
 
-	var NOTIFICATION_PERIOD_IN_MS = Number.parseInt(process.env.NOTIFICATION_PERIOD_IN_MS, 10) || 60000;
-	var NOTIFICATION_TIMEOUT = {
+	let NOTIFICATION_PERIOD_IN_MS = Number.parseInt(process.env.NOTIFICATION_PERIOD_IN_MS, 10) || 60000;
+	let NOTIFICATION_TIMEOUT = {
 		label: process.env.NOTIFICATION_TIMEOUT_LABEL || '8 hours', // eslint-disable-line no-irregular-whitespace
 		value: Number.parseInt(process.env.NOTIFICATION_TIMEOUT_VALUE, 10) || 8 * 60 * 60000
 	};
 
 	(function() {
-		var logMessage = [
+		let logMessage = [
 			'Using the following notifications settings:',
 			'- Notification period: ' + NOTIFICATION_PERIOD_IN_MS + ' ms',
 			'- Notification timeout: ' + NOTIFICATION_TIMEOUT.value + ' ms',
@@ -87,7 +87,7 @@ module.exports = function(robot) {
 	];
 
 	// Region/domain info
-	var REGION_INFO = {};
+	let REGION_INFO = {};
 	DOMAINS.forEach(function(domain) {
 		REGION_INFO[domain] = {
 			domain: domain,
@@ -99,7 +99,7 @@ module.exports = function(robot) {
 	REGION_INFO[DOMAIN_SYDNEY].region = 'Sydney';
 
 	// Notification request definitions
-	var notificationRequestMap = {
+	let notificationRequestMap = {
 	};
 	DOMAINS.forEach(function(domain) {
 		notificationRequestMap[domain] = {
@@ -114,7 +114,7 @@ module.exports = function(robot) {
 		return REGION_INFO[domain];
 	}
 	function regionInfoForRegion(text) {
-		var lowercaseText = text.toLowerCase();
+		let lowercaseText = text.toLowerCase();
 		let domains = Object.keys(REGION_INFO);
 		for (let i = 0; i < domains.length; i++) {
 			let ri = REGION_INFO[domains[i]];
@@ -350,7 +350,7 @@ module.exports = function(robot) {
 		});
 	}, NOTIFICATION_PERIOD_IN_MS);
 
-	var reportIssue = function(res, message) {
+	let reportIssue = function(res, message) {
 		robot.logger.error(`${TAG}: An error occurred.`);
 		robot.logger.error(message);
 		let msg = i18n.__('error');
@@ -378,11 +378,11 @@ module.exports = function(robot) {
 	});
 	function regionStatus(res, aRegion) {
 		robot.logger.debug(`${TAG}: ${REGION_STATUS_ID} res.message.text=${res.message.text}.`);
-		var regionInfo = regionInfoForRegion(aRegion);
-		var region = regionInfo.domain;
+		let regionInfo = regionInfoForRegion(aRegion);
+		let region = regionInfo.domain;
 		robot.logger.info(`${TAG}: Asynch call using status module to check on domain ${region}`);
 		statusModule.getStatus(region).then(function(resp) {
-			var attachments = [];
+			let attachments = [];
 			if (resp.ko.length) {
 				attachments.push({
 					title: i18n.__('healthy.region.status', aRegion),
@@ -455,12 +455,12 @@ module.exports = function(robot) {
 	});
 	function serviceStatus(res, aRegion, aService) {
 		robot.logger.debug(`${TAG}: ${SERVICE_STATUS_ID} res.message.text=${res.message.text}.`);
-		var regionInfo = regionInfoForRegion(aRegion);
-		var region = regionInfo.domain;
-		var service = cf.getServiceLabel(aService);
+		let regionInfo = regionInfoForRegion(aRegion);
+		let region = regionInfo.domain;
+		let service = cf.getServiceLabel(aService);
 		robot.logger.info(`${TAG}: Asynch call using status module to check on service ${service} in domain ${region}`);
 		statusModule.getServiceStatus(region, service).then(function(status) {
-			var color = status === 'up' ? COLORS.healthy : COLORS.outage;
+			let color = status === 'up' ? COLORS.healthy : COLORS.outage;
 
 			// Emit the app status as an attachment
 			robot.emit('ibmcloud.formatter', {
@@ -520,10 +520,10 @@ module.exports = function(robot) {
 	});
 	function serviceMonitor(res, aRegion, aService, theStatus) {
 		robot.logger.debug(`${TAG}: ${SERVICE_MONITOR_ID} res.message.text=${res.message.text}.`);
-		var regionInfo = regionInfoForRegion(aRegion);
-		var domain = regionInfo.domain;
-		var status = theStatus.toLowerCase();
-		var service = cf.getServiceLabel(aService);
+		let regionInfo = regionInfoForRegion(aRegion);
+		let domain = regionInfo.domain;
+		let status = theStatus.toLowerCase();
+		let service = cf.getServiceLabel(aService);
 
 		// See if this user is currently monitoring this service in this domain
 		let matchIndex = -1;
@@ -608,7 +608,7 @@ module.exports = function(robot) {
 	function getServicesInSpace(activeSpaceGuid) {
 		return new Promise(function(resolve, reject) {
 			cf.Spaces.getSummary(activeSpaceGuid).then(function(result) {
-				var services = [];
+				let services = [];
 				result.services.forEach(function(service) {
 					if (service.service_plan) {
 						services.push(service.service_plan.service.label + ' [' + service.service_plan.name + ']');
@@ -624,7 +624,7 @@ module.exports = function(robot) {
 		return new Promise(function(resolve, reject) {
 			getServicesInSpace(activeSpaceGuid).then(function(services) {
 				statusModule.getStatus(domain).then(function(resp) {
-					var newresp = {
+					let newresp = {
 						ok: [],
 						ko: [],
 						unknown: []
@@ -661,7 +661,7 @@ module.exports = function(robot) {
 		let activeSpace = cf.activeSpace(robot, res);
 		let regionInfo = regionInfoForEnv();
 		getStatusForServicesInSpace(activeSpace.guid, regionInfo.domain).then(function(resp) {
-			var attachments = [];
+			let attachments = [];
 			if (resp.ko.length > 0) {
 				attachments.push({
 					title: i18n.__('healthy.space.status', activeSpace.name),
